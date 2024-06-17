@@ -1,0 +1,5 @@
+proxmox_url   = "https://192.168.0.131:8006/api2/json"
+proxmox_node   = "proxmox"
+iso_file       = "Kingstone-data:iso/ubuntu-24.04-live-server-amd64.iso"
+ssh_username   = "administrator"
+storage        = "Kingstone-data"
