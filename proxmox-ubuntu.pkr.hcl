@@ -15,6 +15,9 @@ variable "iso_file" {}
 variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
+variable "public_key_file" {
+  default = "administrator.pub"
+}
 
 
 source "proxmox-iso" "ubuntu" {
@@ -51,8 +54,18 @@ source "proxmox-iso" "ubuntu" {
 build {
   sources = ["source.proxmox-iso.ubuntu"]
 
+  provisioner "file" {
+    source      = var.public_key_file
+    destination = "/tmp/your-public-key-file"
+  }
+
   provisioner "shell" {
     inline = [
+      "mkdir -p /home/${var.ssh_username}/.ssh",
+      "cat /tmp/your-public-key-file >> /home/${var.ssh_username}/.ssh/authorized_keys",
+      "chown -R ${var.ssh_username}:${var.ssh_username} /home/${var.ssh_username}/.ssh",
+      "chmod 600 /home/${var.ssh_username}/.ssh/authorized_keys",
+      "rm /tmp/your-public-key-file",
       "echo ${var.ssh_password} | sudo -S apt-get update ",
       "echo ${var.ssh_password} | sudo -S apt-get upgrade -y ",
       "echo ${var.ssh_password} | sudo -S apt-get install -y git",
