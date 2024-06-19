@@ -65,13 +65,13 @@ build {
 
   provisioner "file" {
     source      = var.provisioning_script
-    destination = "/tmp/provisioning.sh"
+    destination = "provisioning.sh"
   }
 
   provisioner "shell" {
     inline = [
-      "chmod +x /tmp/provisioning.sh",
-      "/tmp/provisioning.sh ${var.ssh_username} ${var.ssh_password} "
+      "chmod +x provisioning.sh",
+      "bash provisioning.sh ${var.ssh_username} ${var.ssh_password}"
     ]
   }
 
