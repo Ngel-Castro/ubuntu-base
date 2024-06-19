@@ -18,6 +18,10 @@ variable "storage" {}
 variable "public_key_file" {
   default = "administrator.pub"
 }
+variable "provisioning_script" {
+  default = "scripts/provisioning.sh"
+}
+
 
 
 source "proxmox-iso" "ubuntu" {
@@ -27,7 +31,7 @@ source "proxmox-iso" "ubuntu" {
   token                     = var.proxmox_token
   node                      = var.proxmox_node
   iso_file                  = var.iso_file
-  vm_name                   = "ubuntu-base-image-alpha"
+  vm_name                   = "ubuntu-base-baking"
   disks {
     disk_size         = "32G"
     storage_pool      = var.storage
@@ -48,7 +52,7 @@ source "proxmox-iso" "ubuntu" {
   template_name        = "ubuntu-server-base"
   http_directory       = "http"
   unmount_iso          = true
-  tags                 = "packer;ubuntu"
+  tags                 = "packer;ubuntu;alpha"
 }
 
 build {
@@ -59,16 +63,15 @@ build {
     destination = "/tmp/your-public-key-file"
   }
 
+  provisioner "file" {
+    source      = var.provisioning_script
+    destination = "/tmp/provisioning.sh"
+  }
+
   provisioner "shell" {
     inline = [
-      "mkdir -p /home/${var.ssh_username}/.ssh",
-      "cat /tmp/your-public-key-file >> /home/${var.ssh_username}/.ssh/authorized_keys",
-      "chown -R ${var.ssh_username}:${var.ssh_username} /home/${var.ssh_username}/.ssh",
-      "chmod 600 /home/${var.ssh_username}/.ssh/authorized_keys",
-      "rm /tmp/your-public-key-file",
-      "echo ${var.ssh_password} | sudo -S apt-get update ",
-      "echo ${var.ssh_password} | sudo -S apt-get upgrade -y ",
-      "echo ${var.ssh_password} | sudo -S apt-get install -y git",
+      "chmod +x /tmp/provisioning.sh",
+      "/tmp/provisioning.sh ${var.ssh_username} ${var.ssh_password} "
     ]
   }
 
