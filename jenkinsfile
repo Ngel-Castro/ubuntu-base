@@ -10,6 +10,10 @@ pipeline {
         ADMIN_CREDENTIALS_ID = "admin-credentials"
         UBUNTU_TEMPLATE="proxmox-ubuntu.pkr.hcl"
     }
+    
+    triggers {
+        cron('H 0 * * 1')
+    }
 
     stages {
 
