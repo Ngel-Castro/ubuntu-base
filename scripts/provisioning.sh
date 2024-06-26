@@ -12,7 +12,7 @@ chown -R ${username}:${username} /home/${username}/.ssh
 chmod 600 /home/${username}/.ssh/authorized_keys
 echo ${password} | sudo -S apt-get update 
 echo ${password} | sudo -S apt-get upgrade -y 
-echo ${password} | sudo -S apt-get install -y git ansible
+echo ${password} | sudo -S apt-get install -y git
 rm /tmp/your-public-key-file
 echo "Cleaning the unique machine-id for dhcp"
 sudo rm -f sudo /etc/machine-id && sudo touch /etc/machine-id 

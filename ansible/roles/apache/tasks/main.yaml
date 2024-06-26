@@ -1,0 +1,48 @@
+---
+- name: Install Web and PHP dependencies.
+  apt:
+    name: 
+      - apache2 
+      - php 
+      - php-cli
+      - php-fpm
+      - php-json
+      - php-common
+      - php-mysql
+      - php-zip
+      - php-gd
+      - php-mbstring
+      - php-curl
+      - php-xml
+      - php-pear
+      - php-bcmath
+      - unzip
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install Composer globally
+  shell: curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+  args:
+    creates: /usr/local/bin/composer
+
+- name: Verify Composer installation
+  command: composer --version
+  register: composer_version_output
+
+- name: Display Composer version
+  debug:
+    msg: "Composer version installed: {{ composer_version_output.stdout }}"
+
+- name: Copy Apache configuration file
+  template:
+    src: app.conf.j2
+    dest: /etc/apache2/sites-available/app.conf
+    mode: '0644'
+
+- name: Create symbolic link 
+  file:
+    src: "/etc/apache2/sites-available/app.conf"
+    dest: "/etc/apache2/sites-enabled/app.conf"
+    state: link
+  notify:
+  - restart apache
