@@ -53,6 +53,7 @@ pipeline {
                             usernamePassword(credentialsId: env.ADMIN_CREDENTIALS_ID, usernameVariable: 'ADMIN_USER', passwordVariable: 'ADMIN_PASS')
                         ]) {
                             sh """
+                            ls -la
                             packer build -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}"   ${env.UBUNTU_TEMPLATE}
                             """
                         }
