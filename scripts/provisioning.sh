@@ -7,8 +7,7 @@ export password=$2
 # Licence : GPLv3
 
 mkdir -p /home/${username}/.ssh
-cat /tmp/administrator-key-file >> /home/${username}/.ssh/authorized_keys
-cat /tmp/jenkins-key-file > /home/${username}/.ssh/authorized_keys
+cat /tmp/your-public-key-file >> /home/${username}/.ssh/authorized_keys
 chown -R ${username}:${username} /home/${username}/.ssh
 chmod 600 /home/${username}/.ssh/authorized_keys
 echo ${password} | sudo -S apt-get update 

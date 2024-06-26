@@ -15,15 +15,13 @@ variable "iso_file" {}
 variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
-variable "administrator_public_key_file" {
+variable "public_key_file" {
   default = "administrator.pub"
-}
-variable "jenkins_public_key_file" {
-  default = "jenkins.pub"
 }
 variable "provisioning_script" {
   default = "scripts/provisioning.sh"
 }
+
 
 
 
@@ -62,13 +60,8 @@ build {
   sources = ["source.proxmox-iso.ubuntu"]
 
   provisioner "file" {
-    source      = var.administrator_public_key_file
-    destination = "/tmp/administrator-key-file"
-  }
-
-  provisioner "file" {
-    source      = var.jenkins_public_key_file
-    destination = "/tmp/jenkins-key-file"
+    source      = var.public_key_file
+    destination = "/tmp/your-public-key-file"
   }
 
   provisioner "file" {
