@@ -33,10 +33,16 @@
   debug:
     msg: "Composer version installed: {{ composer_version_output.stdout }}"
 
-# - name: Copy Apache configuration file
-#   template:
-#     src: apache2.conf.j2
-#     dest: /etc/apache2/apache2.conf
-#     mode: '0644'
-#   notify:
-#     - restart apache
+- name: Copy Apache configuration file
+  template:
+    src: app.conf.j2
+    dest: /etc/apache2/sites-available/app.conf
+    mode: '0644'
+
+- name: Create symbolic link 
+  file:
+    src: "/etc/apache2/sites-available/app.conf"
+    dest: "/etc/apache2/sites-enabled/app.conf"
+    state: link
+  notify:
+  - restart apache
