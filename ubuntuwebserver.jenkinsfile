@@ -1,0 +1,81 @@
+pipeline {
+    agent any
+    environment {
+        GIT_HASH = GIT_COMMIT.take(8)
+        //GIT_HASH = "test-sever"
+        // Directory to store the Terraform state file
+        UBUNTU_COMMON="base-values/common.pkvars.hcl"
+        SSH_CREDENTIALS_ID = "ssh-key-credential"
+        PROXMOX_CREDENITALS_ID = "proxmox-credentials"
+        ADMIN_CREDENTIALS_ID = "admin-credentials"
+        UBUNTU_TEMPLATE="proxmox-ubuntu-web.pkr.hcl"
+    }
+
+    triggers {
+        cron('H 0 * * 1')
+    }
+
+    stages {
+        stage('Check if this is the correct week') {
+            when {
+                expression {
+                    def currentWeek = new Date().format('w').toInteger()
+                    return (currentWeek % 2) == 0 // Adjust this to control which weeks to run
+                }
+            }
+            stages {
+
+                stage('tofu Init') {
+                    steps {
+                        sh """
+                        packer init ${env.UBUNTU_TEMPLATE}
+                        """
+                    }
+                }
+
+                stage('Packer validate') {
+                    steps {
+                        withCredentials([
+                            usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                            usernamePassword(credentialsId: env.ADMIN_CREDENTIALS_ID, usernameVariable: 'ADMIN_USER', passwordVariable: 'ADMIN_PASS')
+                        ]) {
+                            sh """
+                            packer validate -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}"   ${env.UBUNTU_TEMPLATE}
+                            """
+                        }
+                    }
+                }
+
+                stage('Packer Build') {
+                    steps {
+                        withCredentials([
+                            usernamePassword(credentialsId: env.PROXMOX_CREDENITALS_ID, usernameVariable: 'PROXMOX_TOKEN_ID', passwordVariable: 'PROXMOX_TOKEN_SECRET'),
+                            usernamePassword(credentialsId: env.ADMIN_CREDENTIALS_ID, usernameVariable: 'ADMIN_USER', passwordVariable: 'ADMIN_PASS')
+                        ]) {
+                            sh """
+                            packer build -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}"   ${env.UBUNTU_TEMPLATE}
+                            """
+                        }
+                        
+                    }
+                }
+
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up workspace after the job is done
+            cleanWs()
+        }
+        success {
+            // Actions to perform when the job succeeds
+            echo 'Build base image completed'
+        }
+        failure {
+            // Actions to perform when the job fails
+            echo 'Build base image failed!'
+        }
+    }
+}

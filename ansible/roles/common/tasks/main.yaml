@@ -1,0 +1,12 @@
+---
+- name: Allow run sudo commands without password
+  community.general.sudoers:
+    name: admin_role
+    state: present
+    user: administrator
+    commands: ALL
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  when: ansible_os_family == "Debian"
