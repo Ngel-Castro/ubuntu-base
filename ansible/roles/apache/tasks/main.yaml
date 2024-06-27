@@ -55,7 +55,7 @@
   notify:
   - restart apache
 
-- name: Verify Composer installation
+- name: Enabled rewrite module
   command: sudo a2enmod rewrite
   notify:
   - restart apache
