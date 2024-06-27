@@ -83,7 +83,9 @@ build {
     playbook_file = "ansible/main.yml"
     extra_arguments = [
       "--extra-vars",
-      "ansible_sudo_pass=${var.ssh_password}"
+      "ansible_sudo_pass=${var.ssh_password}",
+      "--scp-extra-args",
+      "'-O'"
     ]
   }
 
