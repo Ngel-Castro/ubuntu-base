@@ -17,6 +17,7 @@
       - php-pear
       - php-bcmath
       - unzip
+      - php-intl
     state: present
   when: ansible_os_family == "Debian"
 
@@ -39,10 +40,22 @@
     dest: /etc/apache2/sites-available/app.conf
     mode: '0644'
 
+- name: Removed default apache config.
+  file:
+    path: "/etc/apache2/sites-enabled/000-default.conf"
+    state: absent
+  notify:
+  - restart apache
+
 - name: Create symbolic link 
   file:
     src: "/etc/apache2/sites-available/app.conf"
     dest: "/etc/apache2/sites-enabled/app.conf"
     state: link
+  notify:
+  - restart apache
+
+- name: Verify Composer installation
+  command: sudo a2enmod rewrite
   notify:
   - restart apache
