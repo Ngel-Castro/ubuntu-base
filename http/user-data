@@ -10,10 +10,15 @@ autoinstall:
     version: 2
     ethernets:
       ens18:
-        dhcp4: true
+       addresses: [172.16.2.180/24]
+       gateway4: 172.16.2.1
+       dhcp4: false
+       nameservers: 
+        addresses: [172.16.25.11]
+       optional: true
   identity:
     hostname: ubuntu-server
-    password: $6$.K5oK.QAa2QxqyeI$kSUcKl0XXFdNc6DPCLm9Ckdfd3OHRsuXDqqW/fuSugSd5xmvQ6qhLByiTgJHPQ2RTC5aIdrYwPE/Pzq5CbpdE1
+    password: $6$bCsLF3NEi8MBT1I/$WA4JRujtZMIoER.LOIyn7i/aaeAzlAwIIxNrInbJxKpAVVp.qlHyJzLVSu9XDxjjzieJs.b9pclx6HsnF/GaD.
     realname: administrator
     username: administrator
   ssh:
