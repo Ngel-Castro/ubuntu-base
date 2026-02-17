@@ -141,7 +141,7 @@ After successful builds, you'll have the following templates in Proxmox:
 - **ubuntu-server-base**: Basic Ubuntu server ready for customization
 - **ubuntu-web-server-base**: Pre-configured web server with Apache and PHP
 
-Both templates are tagged with `packer` and `ubuntu` (web server also tagged with `web` and `alpha`).
+Both templates are tagged with `packer` and `ubuntu`. The web server template is additionally tagged with `web` and `alpha` (indicating it's in testing/development phase).
 
 ## Development
 
