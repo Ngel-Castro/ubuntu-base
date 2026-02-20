@@ -24,8 +24,11 @@ autoinstall:
   drivers:
     install: false
   packages:
-  - qemu-guest-agent
+    - qemu-guest-agent
   storage:
     layout:
       name: lvm
   updates: security
+  late-commands:
+    - curtin in-target -- systemctl enable qemu-guest-agent
+    - curtin in-target -- systemctl start qemu-guest-agent
