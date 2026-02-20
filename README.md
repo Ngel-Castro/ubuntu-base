@@ -70,6 +70,13 @@ Both pipelines:
 - Ubuntu 24.04 LTS ISO uploaded to Proxmox storage
 - Proxmox API token with appropriate permissions
 
+### Jenkins Agent Requirements
+
+The Jenkins agent nodes that run the pipelines must have the following tools available on `PATH` at runtime:
+
+- **`packer`** — for building templates
+- **`openssl`** — used to generate the SHA-512 hashed password at build time (`openssl passwd -6`). Without this, the pipeline will fail at the validate and build stages. Most Linux-based agents have it pre-installed; verify with `which openssl`. On Debian/Ubuntu agents it can be installed with `apt-get install -y openssl`.
+
 ## Configuration
 
 ### Variables File (`base-values/common.pkvars.hcl`)
@@ -98,6 +105,7 @@ packer validate \
   -var "proxmox_user=${PROXMOX_TOKEN_ID}" \
   -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" \
   -var "ssh_password=${ADMIN_PASSWORD}" \
+  -var "hashed_password=${HASHED_PASSWORD}" \
   proxmox-ubuntu.pkr.hcl
 ```
 
@@ -111,6 +119,7 @@ packer build \
   -var "proxmox_user=${PROXMOX_TOKEN_ID}" \
   -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" \
   -var "ssh_password=${ADMIN_PASSWORD}" \
+  -var "hashed_password=${HASHED_PASSWORD}" \
   proxmox-ubuntu.pkr.hcl
 ```
 
@@ -124,15 +133,25 @@ packer build \
   -var "proxmox_user=${PROXMOX_TOKEN_ID}" \
   -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" \
   -var "ssh_password=${ADMIN_PASSWORD}" \
+  -var "hashed_password=${HASHED_PASSWORD}" \
   proxmox-ubuntu-web.pkr.hcl
 ```
 
 ### Environment Variables
 
-Set the following environment variables:
+Set the following environment variables before running any Packer command:
+
+```bash
+export PROXMOX_TOKEN_ID="your-token-id"
+export PROXMOX_TOKEN_SECRET="your-token-secret"
+export ADMIN_PASSWORD="your-password"
+export HASHED_PASSWORD=$(openssl passwd -6 "$ADMIN_PASSWORD")
+```
+
 - `PROXMOX_TOKEN_ID`: Your Proxmox API token ID
 - `PROXMOX_TOKEN_SECRET`: Your Proxmox API token secret
-- `ADMIN_PASSWORD`: The administrator user password
+- `ADMIN_PASSWORD`: The administrator user password (plaintext, used by Packer SSH provisioners)
+- `HASHED_PASSWORD`: SHA-512 crypt hash of the password, generated via `openssl passwd -6`. This is injected into the cloud-init `user-data` at build time so no plaintext or static hash is stored in source control.
 
 ## Templates Created
 

@@ -40,7 +40,8 @@ pipeline {
                             usernamePassword(credentialsId: env.ADMIN_CREDENTIALS_ID, usernameVariable: 'ADMIN_USER', passwordVariable: 'ADMIN_PASS')
                         ]) {
                             sh """
-                            packer validate -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}"   ${env.UBUNTU_TEMPLATE}
+                            HASHED_PASSWORD=\$(openssl passwd -6 "${ADMIN_PASS}")
+                            packer validate -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}" -var "hashed_password=\${HASHED_PASSWORD}" ${env.UBUNTU_TEMPLATE}
                             """
                         }
                     }
@@ -54,7 +55,8 @@ pipeline {
                         ]) {
                             sh """
                             ls -la
-                            packer build -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}"   ${env.UBUNTU_TEMPLATE}
+                            HASHED_PASSWORD=\$(openssl passwd -6 "${ADMIN_PASS}")
+                            packer build -var-file=${env.UBUNTU_COMMON} -var "proxmox_user=${PROXMOX_TOKEN_ID}" -var "proxmox_token=${PROXMOX_TOKEN_SECRET}" -var "ssh_password=${ADMIN_PASS}" -var "hashed_password=\${HASHED_PASSWORD}" ${env.UBUNTU_TEMPLATE}
                             """
                         }
                         

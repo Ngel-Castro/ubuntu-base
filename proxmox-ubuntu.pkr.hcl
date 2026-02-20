@@ -15,6 +15,7 @@ variable "iso_file" {}
 variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
+variable "hashed_password" {}
 variable "public_key_file" {
   default = "administrator.pub"
 }
@@ -48,10 +49,23 @@ source "proxmox-iso" "ubuntu" {
   ssh_password         = var.ssh_password
   ssh_timeout          = "15m"
   boot_wait      = "10s"
-  boot_command = ["e<wait><down><down><down><end> autoinstall 'ds=nocloud;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/'<F10>"]
+  boot_command = [
+    "c<wait>",
+    "linux /casper/vmlinuz autoinstall ds=nocloud<enter><wait>",
+    "initrd /casper/initrd<enter><wait>",
+    "boot<enter>"
+  ]
+  additional_iso_files {
+    cd_content = {
+      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password })
+      "meta-data" = ""
+    }
+    cd_label         = "cidata"
+    iso_storage_pool = var.storage
+    unmount          = true
+  }
   template_description = "Ubuntu 22.04, generated on ${timestamp()}"
   template_name        = "ubuntu-server-base"
-  http_directory       = "http"
   unmount_iso          = true
   tags                 = "packer;ubuntu;alpha"
 }
