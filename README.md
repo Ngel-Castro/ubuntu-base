@@ -70,6 +70,13 @@ Both pipelines:
 - Ubuntu 24.04 LTS ISO uploaded to Proxmox storage
 - Proxmox API token with appropriate permissions
 
+### Jenkins Agent Requirements
+
+The Jenkins agent nodes that run the pipelines must have the following tools available on `PATH` at runtime:
+
+- **`packer`** — for building templates
+- **`openssl`** — used to generate the SHA-512 hashed password at build time (`openssl passwd -6`). Without this, the pipeline will fail at the validate and build stages. Most Linux-based agents have it pre-installed; verify with `which openssl`. On Debian/Ubuntu agents it can be installed with `apt-get install -y openssl`.
+
 ## Configuration
 
 ### Variables File (`base-values/common.pkvars.hcl`)
