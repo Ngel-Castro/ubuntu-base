@@ -89,6 +89,7 @@ build {
   }
 
   provisioner "shell" {
+    expect_disconnect = true
     inline = [
       "chmod +x provisioning.sh",
       "bash provisioning.sh ${var.ssh_username} ${var.ssh_password}"

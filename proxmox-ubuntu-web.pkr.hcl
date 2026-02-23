@@ -21,7 +21,7 @@ variable "ssh_password" {}
 variable "storage" {}
 variable "hashed_password" {}
 variable "baking_ip" {
-  default = "192.168.0.134"
+  default = "192.168.0.135"
 }
 variable "ansible_command" {
   default = "ansible-playbook"
@@ -95,6 +95,7 @@ build {
   }
 
   provisioner "shell" {
+    expect_disconnect = true
     inline = [
       "chmod +x provisioning.sh",
       "bash provisioning.sh ${var.ssh_username} ${var.ssh_password}"
@@ -104,6 +105,8 @@ build {
   provisioner "ansible" {
     playbook_file = "ansible/main.yml"
     command       = var.ansible_command
+    pause_before  = "30s"
+    max_retries   = 3
     extra_arguments = [
       "--extra-vars",
       "ansible_sudo_pass=${var.ssh_password}",

@@ -10,9 +10,11 @@ mkdir -p /home/${username}/.ssh
 cat /tmp/your-public-key-file >> /home/${username}/.ssh/authorized_keys
 chown -R ${username}:${username} /home/${username}/.ssh
 chmod 600 /home/${username}/.ssh/authorized_keys
-echo ${password} | sudo -S apt-get update 
-echo ${password} | sudo -S apt-get upgrade -y 
-echo ${password} | sudo -S apt-get install -y git ansible qemu-guest-agent
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+echo ${password} | sudo -S apt-get update
+echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y git ansible qemu-guest-agent
 echo ${password} | sudo -S systemctl enable qemu-guest-agent
 echo "Resetting network to DHCP for cloned VMs"
 sudo tee /etc/netplan/00-installer-config.yaml > /dev/null << 'EOF'
