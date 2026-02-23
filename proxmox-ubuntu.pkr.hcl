@@ -42,8 +42,9 @@ source "proxmox-iso" "ubuntu" {
   memory         = 2048
   cores          = 2
   network_adapters {
-    bridge = "vmbr0"
-    model  = "virtio"
+    bridge   = "vmbr0"
+    model    = "virtio"
+    vlan_tag = "3"
   }
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
