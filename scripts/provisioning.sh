@@ -14,6 +14,15 @@ echo ${password} | sudo -S apt-get update
 echo ${password} | sudo -S apt-get upgrade -y 
 echo ${password} | sudo -S apt-get install -y git ansible qemu-guest-agent
 echo ${password} | sudo -S systemctl enable qemu-guest-agent
+echo "Resetting network to DHCP for cloned VMs"
+sudo tee /etc/netplan/00-installer-config.yaml > /dev/null << 'EOF'
+network:
+  version: 2
+  ethernets:
+    ens18:
+      dhcp4: true
+EOF
+sudo chmod 600 /etc/netplan/00-installer-config.yaml
 rm /tmp/your-public-key-file
 echo "Cleaning the unique machine-id for dhcp"
 sudo rm -f sudo /etc/machine-id && sudo touch /etc/machine-id 

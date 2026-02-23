@@ -16,6 +16,9 @@ variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
 variable "hashed_password" {}
+variable "baking_ip" {
+  default = "192.168.0.133"
+}
 variable "public_key_file" {
   default = "administrator.pub"
 }
@@ -48,6 +51,7 @@ source "proxmox-iso" "ubuntu" {
   }
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
+  ssh_host             = var.baking_ip
   ssh_timeout          = "15m"
   boot_wait      = "10s"
   boot_command = [
@@ -58,7 +62,7 @@ source "proxmox-iso" "ubuntu" {
   ]
   additional_iso_files {
     cd_content = {
-      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password })
+      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password, baking_ip = var.baking_ip })
       "meta-data" = ""
     }
     cd_label         = "cidata"

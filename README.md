@@ -76,6 +76,7 @@ The Jenkins agent nodes that run the pipelines must have the following tools ava
 
 - **`packer`** — for building templates
 - **`openssl`** — used to generate the SHA-512 hashed password at build time (`openssl passwd -6`). Without this, the pipeline will fail at the validate and build stages. Most Linux-based agents have it pre-installed; verify with `which openssl`. On Debian/Ubuntu agents it can be installed with `apt-get install -y openssl`.
+- **`ansible-playbook`** — required for the web server template only. Install via pip (`pip install ansible`) or point Packer to a virtualenv path using the `ansible_command` variable (see below).
 
 ## Configuration
 
@@ -128,6 +129,9 @@ packer build \
 ```bash
 packer init proxmox-ubuntu-web.pkr.hcl
 
+# If ansible-playbook is not on PATH (e.g. installed in a Poetry virtualenv):
+export PKR_VAR_ansible_command=$(poetry run which ansible-playbook)
+
 packer build \
   -var-file=base-values/common.pkvars.hcl \
   -var "proxmox_user=${PROXMOX_TOKEN_ID}" \
@@ -157,10 +161,19 @@ export HASHED_PASSWORD=$(openssl passwd -6 "$ADMIN_PASSWORD")
 
 After successful builds, you'll have the following templates in Proxmox:
 
-- **ubuntu-server-base**: Basic Ubuntu server ready for customization
-- **ubuntu-web-server-base**: Pre-configured web server with Apache and PHP
+| Template | Description | Default Baking IP |
+|---|---|---|
+| **ubuntu-server-base** | Basic Ubuntu server ready for customization | `192.168.0.133` |
+| **ubuntu-web-server-base** | Pre-configured web server with Apache and PHP | `192.168.0.134` |
 
 Both templates are tagged with `packer` and `ubuntu`. The web server template is additionally tagged with `web` and `alpha` (indicating it's in testing/development phase).
+
+> **Note:** The baking IPs are **static IPs used only during the Packer build process** so that Packer can reliably SSH into the VM. They are defined per-template in the `templatefile()` call and referenced as `${baking_ip}` in `http/user-data.pkrtpl`. Once provisioning is complete, the netplan configuration is overwritten with DHCP, so all VMs cloned from these templates will obtain their IP dynamically on boot.
+>
+> The defaults can be overridden by passing `-var "baking_ip=x.x.x.x"` or by setting the `PKR_VAR_baking_ip` environment variable:
+> ```bash
+> export PKR_VAR_baking_ip="192.168.1.50"
+> ```
 
 ## Development
 
