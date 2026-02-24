@@ -60,8 +60,8 @@ source "proxmox-iso" "ubuntu" {
   boot_wait      = "10s"
   boot_command = [
     "c<wait>",
-    "linux /casper/vmlinuz autoinstall ds=nocloud<enter><wait>",
-    "initrd /casper/initrd<enter><wait>",
+    "linux /casper/vmlinuz boot=casper quiet autoinstall ds=nocloud<enter><wait5>",
+    "initrd /casper/initrd<enter><wait5>",
     "boot<enter>"
   ]
   additional_iso_files {
