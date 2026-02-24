@@ -43,6 +43,7 @@ source "proxmox-iso" "ubuntu" {
   node                      = var.proxmox_node
   vm_name                   = "ubuntu-web-server-baking"
   boot_iso {
+    type     = "ide"
     iso_file = var.iso_file
     unmount  = true
   }
