@@ -35,8 +35,11 @@ source "proxmox-iso" "ubuntu" {
   username                  = var.proxmox_user
   token                     = var.proxmox_token
   node                      = var.proxmox_node
-  iso_file                  = var.iso_file
   vm_name                   = "ubuntu-base-baking"
+  boot_iso {
+    iso_file = var.iso_file
+    unmount  = true
+  }
   disks {
     disk_size         = "32G"
     storage_pool      = var.storage
@@ -71,7 +74,6 @@ source "proxmox-iso" "ubuntu" {
   }
   template_description = "Ubuntu 22.04, generated on ${timestamp()}"
   template_name        = "ubuntu-server-base"
-  unmount_iso          = true
   tags                 = "packer;ubuntu;alpha"
 }
 
