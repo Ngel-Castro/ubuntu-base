@@ -14,19 +14,18 @@ export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 echo ${password} | sudo -S apt-get update
 echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y git ansible qemu-guest-agent
+echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y git ansible qemu-guest-agent cloud-init
 echo ${password} | sudo -S systemctl enable qemu-guest-agent
-echo "Resetting network to DHCP for cloned VMs"
-sudo tee /etc/netplan/00-installer-config.yaml > /dev/null << 'EOF'
-network:
-  version: 2
-  ethernets:
-    ens18:
-      dhcp4: true
+echo "Configuring cloud-init for Proxmox NoCloud datasource"
+echo ${password} | sudo -S tee /etc/cloud/cloud.cfg.d/99-pve.cfg > /dev/null << 'EOF'
+datasource_list: [NoCloud, ConfigDrive]
 EOF
-sudo chmod 600 /etc/netplan/00-installer-config.yaml
+# Remove baked-in static netplan so cloud-init writes network config from Proxmox ipconfig0 on clone
+echo ${password} | sudo -S rm -f /etc/netplan/00-installer-config.yaml
 rm /tmp/your-public-key-file
-echo "Cleaning the unique machine-id for dhcp"
-sudo rm -f sudo /etc/machine-id && sudo touch /etc/machine-id 
+echo "Cleaning the unique machine-id for cloned VMs"
+sudo rm -f /etc/machine-id && sudo touch /etc/machine-id
 sudo rm -f /var/lib/dbus/machine-id
 sudo ln -s /etc/machine-id /var/lib/dbus/machine-id
+echo "Resetting cloud-init state for clean first-boot on clone"
+echo ${password} | sudo -S cloud-init clean --logs
