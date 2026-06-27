@@ -16,6 +16,8 @@ echo ${password} | sudo -S apt-get update
 echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y git ansible qemu-guest-agent cloud-init
 echo ${password} | sudo -S systemctl enable qemu-guest-agent
+echo "Configuring passwordless sudo for ${username} (required for Ansible become)"
+echo ${password} | sudo -S bash -c "echo \"${username} ALL=(ALL) NOPASSWD:ALL\" > /etc/sudoers.d/${username}-nopasswd && chmod 440 /etc/sudoers.d/${username}-nopasswd"
 echo "Configuring cloud-init for Proxmox NoCloud datasource"
 echo ${password} | sudo -S tee /etc/cloud/cloud.cfg.d/99-pve.cfg > /dev/null << 'EOF'
 datasource_list: [NoCloud, ConfigDrive]
