@@ -16,6 +16,12 @@ echo ${password} | sudo -S apt-get update
 echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get upgrade -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
 echo ${password} | sudo -SE DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y git ansible qemu-guest-agent cloud-init
 echo ${password} | sudo -S systemctl enable qemu-guest-agent
+echo "Installing Vacks CA root certificate for *.dev.home trust (harbor.dev.home, etc.)"
+echo ${password} | sudo -S cp /tmp/vacks-root-ca.crt /usr/local/share/ca-certificates/vacks-ca.crt
+echo ${password} | sudo -S update-ca-certificates
+echo ${password} | sudo -S mkdir -p /etc/docker/certs.d/harbor.dev.home
+echo ${password} | sudo -S cp /tmp/vacks-root-ca.crt /etc/docker/certs.d/harbor.dev.home/ca.crt
+rm /tmp/vacks-root-ca.crt
 echo "Configuring cloud-init for Proxmox NoCloud datasource"
 echo ${password} | sudo -S tee /etc/cloud/cloud.cfg.d/99-pve.cfg > /dev/null << 'EOF'
 datasource_list: [NoCloud, ConfigDrive]

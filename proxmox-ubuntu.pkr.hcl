@@ -25,6 +25,9 @@ variable "public_key_file" {
 variable "provisioning_script" {
   default = "scripts/provisioning.sh"
 }
+variable "vacks_ca_cert" {
+  default = "certs/vacks-root-ca.crt"
+}
 
 
 
@@ -89,6 +92,11 @@ build {
   provisioner "file" {
     source      = var.provisioning_script
     destination = "provisioning.sh"
+  }
+
+  provisioner "file" {
+    source      = var.vacks_ca_cert
+    destination = "/tmp/vacks-root-ca.crt"
   }
 
   provisioner "shell" {
