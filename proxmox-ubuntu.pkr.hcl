@@ -28,6 +28,12 @@ variable "provisioning_script" {
 variable "vacks_ca_cert" {
   default = "certs/vacks-root-ca.crt"
 }
+variable "harbor_robot_user" {
+  default = ""
+}
+variable "harbor_robot_password" {
+  default = ""
+}
 
 
 
@@ -103,7 +109,7 @@ build {
     expect_disconnect = true
     inline = [
       "chmod +x provisioning.sh",
-      "bash provisioning.sh ${var.ssh_username} ${var.ssh_password}"
+      "bash provisioning.sh ${var.ssh_username} ${var.ssh_password} '${var.harbor_robot_user}' '${var.harbor_robot_password}'"
     ]
   }
 
