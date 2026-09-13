@@ -21,7 +21,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install linting tools
-        run: pip install ansible-lint yamllint
+        run: pip install "ansible-lint>=24.0.0,<25" "yamllint>=1.35.0,<2"
 
       - name: Run yamllint
         run: yamllint -c .yamllint.yml ansible/
@@ -44,7 +44,7 @@ jobs:
 
       - name: Install Molecule and dependencies
         run: |
-          pip install ansible molecule molecule-plugins[docker] docker
+          pip install "ansible>=10.1.0,<11" "molecule>=24.0.0,<25" "molecule-plugins[docker]>=23.0.0,<24" docker
 
       - name: Run Molecule test (apache)
         run: molecule test
@@ -65,7 +65,7 @@ jobs:
 
       - name: Install Molecule and dependencies
         run: |
-          pip install ansible molecule molecule-plugins[docker] docker
+          pip install "ansible>=10.1.0,<11" "molecule>=24.0.0,<25" "molecule-plugins[docker]>=23.0.0,<24" docker
 
       - name: Run Molecule test (common)
         run: molecule test

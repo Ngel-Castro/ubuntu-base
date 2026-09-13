@@ -10,7 +10,9 @@
       failed_when: not sudoers_file.stat.exists
 
     - name: Check apt cache was updated recently
-      ansible.builtin.stat:
-        path: /var/lib/apt/lists
-      register: apt_lists
-      failed_when: not apt_lists.stat.exists
+      ansible.builtin.find:
+        paths: /var/lib/apt/lists
+        patterns: "*Packages"
+        age: "-3600"
+      register: apt_cache_files
+      failed_when: apt_cache_files.matched == 0
