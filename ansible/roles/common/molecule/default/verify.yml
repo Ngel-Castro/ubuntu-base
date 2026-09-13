@@ -1,0 +1,16 @@
+---
+- name: Verify common role
+  hosts: all
+  become: true
+  tasks:
+    - name: Check sudoers entry exists for administrator
+      ansible.builtin.stat:
+        path: /etc/sudoers.d/admin_role
+      register: sudoers_file
+      failed_when: not sudoers_file.stat.exists
+
+    - name: Check apt cache was updated recently
+      ansible.builtin.stat:
+        path: /var/lib/apt/lists
+      register: apt_lists
+      failed_when: not apt_lists.stat.exists
