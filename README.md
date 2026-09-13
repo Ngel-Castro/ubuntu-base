@@ -185,7 +185,53 @@ Install dependencies using Poetry:
 poetry install
 ```
 
-This will install Ansible and other development dependencies.
+This will install Ansible, Molecule, ansible-lint, yamllint, and other development dependencies.
+
+### Running Molecule tests locally
+
+Molecule requires **Docker** to be running locally. Each Ansible role has its own Molecule scenario under `ansible/roles/<role>/molecule/default/`.
+
+```bash
+# Test a specific role (runs create → converge → idempotence → verify → destroy)
+cd ansible/roles/apache
+molecule test
+
+cd ansible/roles/common
+molecule test
+```
+
+You can also run individual Molecule steps:
+
+```bash
+# Only converge (apply the role)
+molecule converge
+
+# Check idempotence (second converge should report no changes)
+molecule idempotence
+
+# Run the verify playbook
+molecule verify
+
+# Tear down the test container
+molecule destroy
+```
+
+### Linting
+
+```bash
+# YAML lint
+yamllint -c .yamllint.yml ansible/
+
+# Ansible lint
+ansible-lint ansible/
+```
+
+### CI
+
+This platform doesn't use GitHub Actions — CI runs as Argo Workflows, triggered
+via the shared smee.io/Argo Events relay. Wiring this repo's lint + Molecule
+checks into that pipeline is tracked under my-ppm #217. Until that lands, run
+lint and `molecule test` locally (see above) before opening a PR.
 
 ## License
 

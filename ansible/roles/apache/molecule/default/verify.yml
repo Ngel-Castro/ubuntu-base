@@ -1,0 +1,51 @@
+---
+- name: Verify apache role
+  hosts: all
+  become: true
+  tasks:
+    - name: Check apache2 is installed
+      ansible.builtin.package:
+        name: apache2
+        state: present
+      check_mode: true
+      register: apache_installed
+      failed_when: apache_installed.changed
+
+    - name: Check apache2 service is enabled and running
+      ansible.builtin.service:
+        name: apache2
+        state: started
+        enabled: true
+      check_mode: true
+      register: apache_service
+      failed_when: apache_service.changed
+
+    - name: Check Apache is listening on port 80
+      ansible.builtin.wait_for:
+        port: 80
+        host: 127.0.0.1
+        timeout: 10
+
+    - name: Check app.conf is in sites-available
+      ansible.builtin.stat:
+        path: /etc/apache2/sites-available/app.conf
+      register: app_conf
+      failed_when: not app_conf.stat.exists
+
+    - name: Check app.conf symlink exists in sites-enabled
+      ansible.builtin.stat:
+        path: /etc/apache2/sites-enabled/app.conf
+      register: app_conf_enabled
+      failed_when: not app_conf_enabled.stat.exists
+
+    - name: Check default config is absent from sites-enabled
+      ansible.builtin.stat:
+        path: /etc/apache2/sites-enabled/000-default.conf
+      register: default_conf
+      failed_when: default_conf.stat.exists
+
+    - name: Check composer is installed
+      ansible.builtin.stat:
+        path: /usr/local/bin/composer
+      register: composer
+      failed_when: not composer.stat.exists
