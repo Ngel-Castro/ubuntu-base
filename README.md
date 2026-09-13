@@ -226,6 +226,13 @@ yamllint -c .yamllint.yml ansible/
 ansible-lint ansible/
 ```
 
+### CI
+
+This platform doesn't use GitHub Actions — CI runs as Argo Workflows, triggered
+via the shared smee.io/Argo Events relay. Wiring this repo's lint + Molecule
+checks into that pipeline is tracked under my-ppm #217. Until that lands, run
+lint and `molecule test` locally (see above) before opening a PR.
+
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details.
