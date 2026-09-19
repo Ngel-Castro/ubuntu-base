@@ -10,4 +10,4 @@ storage        = "Kingstone_Backups"
 # reproduce this environment's actual network exactly as it was before.
 network_bridge   = "vmbr0"
 network_model    = "virtio"
-network_vlan_tag = null
+network_vlan_tag = "3"
