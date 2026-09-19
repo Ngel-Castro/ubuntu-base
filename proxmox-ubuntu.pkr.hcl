@@ -35,6 +35,25 @@ variable "harbor_robot_password" {
   default = ""
 }
 
+# my-ppm #231: bridge/model/vlan_tag used to be hardcoded directly in the
+# network_adapters block below. vlan_tag defaults to "" here so a bare
+# `packer build` (no var overrides) produces a bridge-only adapter with no
+# VLAN tagging -- the packer-plugin-proxmox network device builder only
+# appends the VLAN tag to the Proxmox API request when the value is
+# non-empty (setDeviceParamIfDefined in step_start_vm.go), so an empty
+# string is not a special case here, it genuinely means "no VLAN".
+# This environment's real values (bridge=vmbr0, model=virtio, vlan_tag=3)
+# come from base-values/common.pkvars.hcl, same as proxmox_node/storage/etc.
+variable "network_bridge" {
+  default = "vmbr0"
+}
+variable "network_model" {
+  default = "virtio"
+}
+variable "network_vlan_tag" {
+  default = ""
+}
+
 
 
 
@@ -58,9 +77,9 @@ source "proxmox-iso" "ubuntu" {
   memory         = 2048
   cores          = 2
   network_adapters {
-    bridge   = "vmbr0"
-    model    = "virtio"
-    vlan_tag = "3"
+    bridge   = var.network_bridge
+    model    = var.network_model
+    vlan_tag = var.network_vlan_tag
   }
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
