@@ -51,7 +51,8 @@ variable "network_model" {
   default = "virtio"
 }
 variable "network_vlan_tag" {
-  default = ""
+  type    = string
+  default = null
 }
 
 
