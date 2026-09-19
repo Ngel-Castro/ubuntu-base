@@ -42,6 +42,21 @@ variable "harbor_robot_password" {
   default = ""
 }
 
+# my-ppm #231: see proxmox-ubuntu.pkr.hcl's identical block for the full
+# explanation -- vlan_tag defaults to "" (no VLAN) since
+# packer-plugin-proxmox only sends the tag to the Proxmox API when it's
+# non-empty. This environment's real values come from
+# base-values/common.pkvars.hcl.
+variable "network_bridge" {
+  default = "vmbr0"
+}
+variable "network_model" {
+  default = "virtio"
+}
+variable "network_vlan_tag" {
+  default = ""
+}
+
 
 
 source "proxmox-iso" "ubuntu" {
@@ -64,9 +79,9 @@ source "proxmox-iso" "ubuntu" {
   memory         = 2048
   cores          = 2
   network_adapters {
-    bridge   = "vmbr0"
-    model    = "virtio"
-    vlan_tag = "3"
+    bridge   = var.network_bridge
+    model    = var.network_model
+    vlan_tag = var.network_vlan_tag
   }
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
