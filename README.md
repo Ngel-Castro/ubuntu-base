@@ -170,10 +170,14 @@ Both templates are tagged with `packer` and `ubuntu`. The web server template is
 
 > **Note:** The baking IPs are **static IPs used only during the Packer build process** so that Packer can reliably SSH into the VM. They are defined per-template in the `templatefile()` call and referenced as `${baking_ip}` in `http/user-data.pkrtpl`. Once provisioning is complete, the netplan configuration is overwritten with DHCP, so all VMs cloned from these templates will obtain their IP dynamically on boot.
 >
-> The defaults can be overridden by passing `-var "baking_ip=x.x.x.x"` or by setting the `PKR_VAR_baking_ip` environment variable:
+> The rest of the baking network is variablized too — `baking_prefix` (default `24`), `baking_gateway` (default `192.168.0.1`) and `baking_dns` (default `["8.8.8.8", "8.8.4.4"]`). On any subnet other than `192.168.0.0/24` you must override the gateway along with the IP, or the VM gets no default route and every `apt` fetch fails with `Network is unreachable`:
 > ```bash
-> export PKR_VAR_baking_ip="192.168.1.50"
+> packer build -var-file=base-values/common.pkvars.hcl \
+>   -var baking_ip=192.168.10.140 -var baking_prefix=24 \
+>   -var baking_gateway=192.168.10.1 -var 'baking_dns=["192.168.10.1"]' \
+>   proxmox-ubuntu.pkr.hcl
 > ```
+> `base-values/danteplatform.pkvars.hcl` pins the Dante platform's own values explicitly; `dante init` prompts for them on a fresh bootstrap.
 
 ## Development
 
