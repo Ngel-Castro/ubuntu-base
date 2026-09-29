@@ -11,3 +11,13 @@ storage        = "Kingstone_Backups"
 network_bridge   = "vmbr0"
 network_model    = "virtio"
 network_vlan_tag = "3"
+
+# The static network the VM-being-baked gets during this platform's bake.
+# The .pkr.hcl defaults for these still match the values below (they were
+# hardcoded in http/user-data.pkrtpl before being variablized), but they're
+# pinned here explicitly so this platform's bake never depends on template
+# defaults -- other environments set their own via -var / `dante init`.
+baking_ip      = "192.168.0.133"
+baking_prefix  = 24
+baking_gateway = "192.168.0.1"
+baking_dns     = ["8.8.8.8", "8.8.4.4"]

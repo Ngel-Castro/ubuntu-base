@@ -19,6 +19,24 @@ variable "hashed_password" {}
 variable "baking_ip" {
   default = "192.168.0.133"
 }
+# The static network the VM-being-baked gets during the bake (rendered into
+# http/user-data.pkrtpl). These used to be hardcoded in that template
+# (/24, gateway 192.168.0.1, Google DNS), so overriding baking_ip alone for a
+# different subnet left the VM with an off-subnet gateway and no route out --
+# every apt fetch failed with "Network is unreachable". Defaults reproduce
+# the original hardcoded values exactly, so existing builds are unchanged.
+variable "baking_gateway" {
+  type    = string
+  default = "192.168.0.1"
+}
+variable "baking_prefix" {
+  type    = number
+  default = 24
+}
+variable "baking_dns" {
+  type    = list(string)
+  default = ["8.8.8.8", "8.8.4.4"]
+}
 variable "public_key_file" {
   default = "administrator.pub"
 }
@@ -95,7 +113,7 @@ source "proxmox-iso" "ubuntu" {
   ]
   additional_iso_files {
     cd_content = {
-      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password, baking_ip = var.baking_ip })
+      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password, baking_ip = var.baking_ip, baking_gateway = var.baking_gateway, baking_prefix = var.baking_prefix, baking_dns = var.baking_dns })
       "meta-data" = ""
     }
     cd_label         = "cidata"
