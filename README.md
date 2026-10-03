@@ -178,6 +178,13 @@ Both templates are tagged with `packer` and `ubuntu`. The web server template is
 >   proxmox-ubuntu.pkr.hcl
 > ```
 > `base-values/danteplatform.pkvars.hcl` pins the Dante platform's own values explicitly; `dante init` prompts for them on a fresh bootstrap.
+>
+> **Admin user and SSH key:** the template's admin user is `ssh_username` (Packer SSHes in as it, and `http/user-data.pkrtpl` creates it), and `public_key_file` is the public key added to that user's `authorized_keys`. The base values use `administrator` and this repo's `administrator.pub`. `dante init` instead asks the operator for their own username and ed25519 key:
+> ```bash
+> packer build -var-file=base-values/common.pkvars.hcl \
+>   -var ssh_username=roberto -var public_key_file=$HOME/.ssh/id_ed25519.pub \
+>   proxmox-ubuntu.pkr.hcl
+> ```
 
 ## Development
 

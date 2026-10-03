@@ -21,3 +21,9 @@ baking_ip      = "192.168.0.133"
 baking_prefix  = 24
 baking_gateway = "192.168.0.1"
 baking_dns     = ["8.8.8.8", "8.8.4.4"]
+
+# The SSH public key installed in the admin user's authorized_keys. The
+# .pkr.hcl default is the same file, but it's pinned here explicitly so this
+# platform's bake never depends on that default -- other environments'
+# `dante init` bakes pass the operator's own ed25519 key instead.
+public_key_file = "administrator.pub"
