@@ -15,7 +15,7 @@ The repository uses Packer to create VM templates on Proxmox that can be used as
 
 - **`proxmox-ubuntu.pkr.hcl`**: Creates a basic Ubuntu server template with:
   - Ubuntu 24.04 LTS
-  - 32GB disk by default (`-var disk_size=100G` to change; the root LV uses the whole disk), 2GB RAM, 2 CPU cores
+  - 32GB disk by default (`-var disk_size=100G` to change; the root LV uses the whole disk), 4GB RAM by default (`-var memory=<MB>` to change), 2 CPU cores
   - SSH key authentication
   - Git and Ansible pre-installed
   - QEMU guest agent

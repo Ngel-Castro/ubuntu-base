@@ -39,6 +39,14 @@ variable "ssh_timeout" {
   type    = string
   default = "15m"
 }
+
+# RAM for the VM being baked, which the template (and every clone) keeps.
+# Used to be hardcoded to 2048; 4 GB gives the autoinstall and clones more
+# headroom. Override with -var memory=<MB>.
+variable "memory" {
+  type    = number
+  default = 4096
+}
 variable "baking_ip" {
   default = "192.168.0.133"
 }
@@ -116,7 +124,7 @@ source "proxmox-iso" "ubuntu" {
     storage_pool      = var.storage
     type              = "scsi"
   }
-  memory         = 2048
+  memory         = var.memory
   cores          = 2
   network_adapters {
     bridge   = var.network_bridge
