@@ -20,6 +20,15 @@ variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
 variable "hashed_password" {}
+
+# The template's disk size. Used to be hardcoded to "32G", so every clone
+# started at 32G and had to be grown by the consumer (OpenTofu's resize on a
+# directory storage can then hit Proxmox's 10s qemu-img resize timeout).
+# `dante init` asks the operator; the default keeps existing builds unchanged.
+variable "disk_size" {
+  type    = string
+  default = "32G"
+}
 variable "baking_ip" {
   default = "192.168.0.133"
 }
@@ -93,7 +102,7 @@ source "proxmox-iso" "ubuntu" {
     unmount  = true
   }
   disks {
-    disk_size         = "32G"
+    disk_size         = var.disk_size
     storage_pool      = var.storage
     type              = "scsi"
   }
