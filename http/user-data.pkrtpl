@@ -24,8 +24,8 @@ autoinstall:
   identity:
     hostname: ubuntu-server
     password: ${hashed_password}
-    realname: administrator
-    username: administrator
+    realname: ${admin_username}
+    username: ${admin_username}
   ssh:
     install-server: true
     allow-pw: true

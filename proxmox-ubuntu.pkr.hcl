@@ -12,6 +12,10 @@ variable "proxmox_user" {}
 variable "proxmox_token" {}
 variable "proxmox_node" {}
 variable "iso_file" {}
+# The template's admin user: Packer SSHes in as this user, and
+# http/user-data.pkrtpl creates it (identity.username/realname), so the two
+# always match. Used to be hardcoded to "administrator" in user-data; base
+# values still set "administrator", while `dante init` asks the operator.
 variable "ssh_username" {}
 variable "ssh_password" {}
 variable "storage" {}
@@ -113,7 +117,7 @@ source "proxmox-iso" "ubuntu" {
   ]
   additional_iso_files {
     cd_content = {
-      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password, baking_ip = var.baking_ip, baking_gateway = var.baking_gateway, baking_prefix = var.baking_prefix, baking_dns = var.baking_dns })
+      "user-data" = templatefile("http/user-data.pkrtpl", { hashed_password = var.hashed_password, baking_ip = var.baking_ip, baking_gateway = var.baking_gateway, baking_prefix = var.baking_prefix, baking_dns = var.baking_dns, admin_username = var.ssh_username })
       "meta-data" = ""
     }
     cd_label         = "cidata"
