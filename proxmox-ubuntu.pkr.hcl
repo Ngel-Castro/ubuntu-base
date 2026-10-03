@@ -29,6 +29,16 @@ variable "disk_size" {
   type    = string
   default = "32G"
 }
+
+# How long Packer waits for SSH -- i.e. for the autoinstall (which applies
+# security updates over the network) to finish and reboot. Used to be
+# hardcoded to "15m", which slow mirrors/links exceed. `dante init
+# --packer-ssh-timeout` overrides it; the default keeps existing builds
+# unchanged.
+variable "ssh_timeout" {
+  type    = string
+  default = "15m"
+}
 variable "baking_ip" {
   default = "192.168.0.133"
 }
@@ -116,7 +126,7 @@ source "proxmox-iso" "ubuntu" {
   ssh_username         = var.ssh_username
   ssh_password         = var.ssh_password
   ssh_host             = var.baking_ip
-  ssh_timeout          = "15m"
+  ssh_timeout          = var.ssh_timeout
   boot_wait      = "10s"
   boot_command = [
     "c<wait>",
