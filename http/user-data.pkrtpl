@@ -37,4 +37,7 @@ autoinstall:
   storage:
     layout:
       name: lvm
+      # The default "scaled" policy gives the root LV only part of the disk
+      # (about half of a 32G disk), so a larger disk_size wouldn't reach /.
+      sizing-policy: all
   updates: security
